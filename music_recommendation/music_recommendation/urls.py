@@ -17,11 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-# from app.recommender_collaborative import views as views_coll
+from app.recommender_collaborative import views as views_coll
+
 # from app.recommender_content import views as views_con
 # from app.user_management import views as views_user
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", views_coll.index),
 ]

@@ -7,6 +7,12 @@ name = "pypi"
 django = "*"
 django-environ = "*"
 requests = "*"
+numpy = "*"
+pandas = "*"
+scipy = "*"
+fuzzywuzzy = "*"
+scikit-learn = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 
