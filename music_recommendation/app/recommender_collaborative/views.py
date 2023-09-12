@@ -2,11 +2,12 @@ import datetime
 
 import numpy as np
 import pandas as pd
-from app.recommender_collaborative.model.recommender import Recommender
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django_pandas.io import read_frame
 from scipy.sparse import csr_matrix
+
+from app.recommender_collaborative.model.recommender import Recommender
 
 from .models import UserBasedDataset
 

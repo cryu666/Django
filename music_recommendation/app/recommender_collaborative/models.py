@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 
+
 class UserBasedDataset(models.Model):
     user_id = models.CharField(primary_key=True, blank=True)
     song_id = models.CharField(blank=True, null=True)
@@ -13,4 +14,4 @@ class UserBasedDataset(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'user_based_dataset'
+        db_table = "user_based_dataset"
