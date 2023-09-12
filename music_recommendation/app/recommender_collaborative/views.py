@@ -5,15 +5,17 @@ import pandas as pd
 from app.recommender_collaborative.model.recommender import Recommender
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django_pandas.io import read_frame
 from scipy.sparse import csr_matrix
+
+from .models import UserBasedDataset
 
 # Create your views here.
 
 
 def index(request):
-    df_songs = pd.read_csv(
-        "~/Django/music_recommendation/app/recommender_collaborative/songs.csv"
-    )
+    songs = UserBasedDataset.objects.all()
+    df_songs = read_frame(songs)
 
     # Filtered the dataset to keep only those users which have listened to at least 16 songs
     song_user = df_songs.groupby("user_id")["song_id"].count()
