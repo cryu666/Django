@@ -1,0 +1,19 @@
+{% extends 'base.html'%}
+
+{% block content %}
+    <h1>Search Results</h1>
+    <div class="list-group">
+
+        {% for x in tracks %}
+        <form method="POST" action="{% url 'songs'%}">
+            {% csrf_token %}
+            <input type="hidden" value="{{x.name}}" name="song_name"/>
+            <input type="hidden" value="{{x.album.release_date}}" name="song_date"/>
+            <button type="submit" class="list-group-item list-group-item-action"> {{x.name}}&emsp; 
+                by {% for y in x.artists %}"{{y.name}}"{% endfor %}<br>
+                Release date: {{x.album.release_date}}</button>
+        </form>    
+        {% endfor %}
+    </div>    
+
+{% endblock %}
