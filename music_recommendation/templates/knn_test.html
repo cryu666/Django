@@ -17,6 +17,14 @@
             <button type="submit">Submit</button>
         </form> 
 
-        <h3>{{ new_recommendation }}</h3>
+        <div></div>
+
+        <form action="" method="post">
+            {% csrf_token %}
+            <input type="text" name="userId_input">
+            <button type="submit">Submit</button>
+        </form>
+
+        <h3>{{ svd_recommendation }}</h3>
     </body>
 </html>

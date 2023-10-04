@@ -6,9 +6,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django_pandas.io import read_frame
 from scipy.sparse import csr_matrix
+from sklearn.model_selection import train_test_split
 
-from app.recommender_collaborative.model.recommender import Recommender
-
+from .model.knn_recommender import KNNRecommender
+from .model.svd_recommender import SVDRecommender
 from .models import UserBasedDataset
 
 # Create your views here.
@@ -18,15 +19,22 @@ def index(request):
     songs = UserBasedDataset.objects.all()
     df_songs = read_frame(songs)
 
-    # Filtered the dataset to keep only those users which have listened to at least 16 songs
-    song_user = df_songs.groupby("user_id")["song_id"].count()
-    song_ten_id = song_user[song_user > 16].index.to_list()
-    df_song_id_more_ten = df_songs[df_songs["user_id"].isin(song_ten_id)].reset_index(
-        drop=True
-    )
+    # Filter users which have listen to at least 20 songs
+    user_counts = df_songs.groupby("user_id")["song_id"].count()
+    user_id_reduced = user_counts[user_counts > 20].index.to_list()
+
+    # Get songs which have been listened at least 20 times
+    song_counts = df_songs.groupby("song_id")["user_id"].count()
+    song_id_reduced = song_counts[song_counts > 20].index.to_list()
+
+    # KNN start
+
+    df_song_id_reduced = df_songs[
+        df_songs["user_id"].isin(user_id_reduced)
+    ].reset_index(drop=True)
 
     # convert the dataframe into a pivot table
-    df_songs_features = df_song_id_more_ten.pivot(
+    df_songs_features = df_song_id_reduced.pivot(
         index="song_id", columns="user_id", values="listen_count"
     ).fillna(0)
 
@@ -46,7 +54,7 @@ def index(request):
         )
     }
 
-    model = Recommender(
+    model = KNNRecommender(
         metric="cosine",
         algorithm="brute",
         k=20,
@@ -54,9 +62,38 @@ def index(request):
         decode_id_song=decode_id_song,
     )
     song = request.POST.get("song_input", "I believe in miracles")  # !!!!!!!!!
-    print(song)
-    new_recommendation = model.make_recommendation(new_song=song, n_recommendations=10)
+    knn_recommendation = model.make_recommendation(new_song=song, n_recommendations=10)
 
-    context = {"new_recommendation": new_recommendation}
+    # SVD start
+
+    df_songs_reduced = df_songs[
+        (df_songs["user_id"].isin(user_id_reduced))
+        & (df_songs["song_id"].isin(song_id_reduced))
+    ].reset_index(drop=True)[["user_id", "song_id", "listen_count"]]
+    df_songs_reduced["listen_count"] = 1
+
+    svd = SVDRecommender(no_of_features=8)
+
+    train, test = train_test_split(df_songs_reduced)
+
+    # Creates the user-item matrix, the user_id on the rows and the song_id on the columns.
+    user_item_matrix, users, items = svd.create_utility_matrix(
+        train,
+        formatizer={"user": "user_id", "item": "song_id", "value": "listen_count"},
+    )
+
+    # fits the svd model to the matrix data.
+    svd.fit(user_item_matrix, users, items)
+
+    # outputs N most similar users to user with user_id x
+    userId = request.POST.get(
+        "userId_input", "b80344d063b5ccb3212f76538f3d9e43d87dca9e"
+    )  # !!!!!!!!!
+    svd_recommendation = svd.topN_similar(x=userId, N=5, column="user")
+
+    context = {
+        "knn_recommendation": knn_recommendation,
+        "svd_recommendation": svd_recommendation,
+    }
 
     return render(request, "knn_test.html", context)  # type(context) should be dict

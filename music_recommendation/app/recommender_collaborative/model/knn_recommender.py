@@ -3,7 +3,7 @@ from fuzzywuzzy import fuzz
 from sklearn.neighbors import NearestNeighbors
 
 
-class Recommender:
+class KNNRecommender:
     def __init__(self, metric, algorithm, k, data, decode_id_song):
         self.metric = metric
         self.algorithm = algorithm
