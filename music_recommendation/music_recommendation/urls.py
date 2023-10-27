@@ -29,6 +29,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include('app.recommender_content.urls')),
+    path('', include('app.user_management.urls')),
 ]
 
 if settings.DEBUG:

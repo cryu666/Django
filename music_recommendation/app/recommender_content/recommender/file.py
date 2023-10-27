@@ -19,13 +19,15 @@ import difflib
 from app.recommender_content.models import ContentBasedSongGenres, ContentBasedStyleGenres
 
 spotify_data = pd.DataFrame(list(ContentBasedSongGenres.objects.all().values()))
-genre_data = pd.DataFrame(list(ContentBasedStyleGenres.objects.all().values()))
 
-cluster_pipeline = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_clusters=10))])
+#genre_data = pd.DataFrame(list(ContentBasedStyleGenres.objects.all().values()))
 
-X = genre_data.select_dtypes(np.number)
-cluster_pipeline.fit(X)
-genre_data['cluster'] = cluster_pipeline.predict(X)
+#cluster_pipeline = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_clusters=10))])
+
+# X = genre_data.select_dtypes(np.number)
+# cluster_pipeline.fit(X)
+# genre_data['cluster'] = cluster_pipeline.predict(X)
+
 song_cluster_pipeline = Pipeline([('scaler', StandardScaler()), ('kmeans', KMeans(n_clusters=20, verbose=2))],verbose=True)
                                 
 X = spotify_data.select_dtypes(np.number)

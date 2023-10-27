@@ -1,0 +1,27 @@
+{% extends 'base.html'%}
+
+{% block content %}
+    {% if request.session.user_id %}
+        <h2>Hello {{ request.session.user_id }} !</h2>
+    {% else %}
+        <h2>Hello World !</h2>
+    {% endif %}
+
+
+    <div class="card">
+        <div class="card-header">Try this funtion:</div>
+        <div class="card-body">
+            <h4 class="card-title">Create Your Emotion Playlist!</h4>
+            <p class="card-text">Upload a picture of you</p>
+            
+            <form method="post" enctype="multipart/form-data" action="{% url 'emo' %}">
+                {% csrf_token %}
+                <input type="file" name="image">
+                <button class="btn btn-outline-primary" type="submit">Upload</button>
+            </form>
+            
+        </div>
+      </div>
+
+
+{% endblock %}

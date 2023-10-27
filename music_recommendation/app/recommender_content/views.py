@@ -3,7 +3,6 @@ from django.shortcuts import render
 
 # Create your views here.
 from .recommender.file import recommend_songs ,spotify_data, search_song
-from django.shortcuts import render
 
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
@@ -17,7 +16,7 @@ import json
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'mainpage.html')
 
 def search(request):
     if request.method == 'POST':
@@ -31,7 +30,7 @@ def songs(request):
         date = request.POST['song_date']
         year = int(date.split('-')[0])
         songs = recommend_songs([{'name': name, 'year': year}], spotify_data)
-    return render(request, 'songs.html', {"search":name, "songs": songs})
+    return render(request, 'recommend_playlist.html', {"search":name, "songs": songs})
         
 
 def upload_img(request):
@@ -70,14 +69,14 @@ def upload_img(request):
                 mood = 'Neutral'
                 songs = recommend_songs([{'name':'Not Angry', 'year': 2020},
                             ], spotify_data)
-            return render(request, 'emo.html', {'image_url': image_url, 'mood': mood, 'songs': songs})
+            return render(request, 'emotion_playlist.html', {'image_url': image_url, 'mood': mood, 'songs': songs})
         except:
             pass
 
         finally:
             if os.path.exists(settings.STATIC_ROOT + '/images/' + filename):
                 os.remove(settings.STATIC_ROOT + '/images/' + filename)
-    return render(request, 'upload_img.html')
+    return render(request, 'mainpage.html')
 
 
 
