@@ -6,6 +6,18 @@ name = "pypi"
 [packages]
 django = "*"
 django-environ = "*"
+psycopg = "*"
+psycopg2-binary = "*"
+numpy = "*"
+pandas = "*"
+spotipy = "*"
+scikit-learn = "*"
+matplotlib = "*"
+collection = "*"
+seaborn = "*"
+install = "*"
+opencv-python = "*"
+deepface = "*"
 
 [dev-packages]
 
