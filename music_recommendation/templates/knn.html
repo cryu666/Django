@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>KNN test</title>
+        <style>
+            body {
+                background-color: rgb(203, 204, 173);
+            }
+            h1,h3{
+                color: rgb(44, 42, 42);
+            }
+        </style>
+    </head>
+    <body>
+        <form action="" method="post">
+            {% csrf_token %}
+            <input type="text" name="song_input">
+            <button type="submit">Submit</button>
+        </form> 
+
+        <div></div>
+
+        <h3>{{ knn_recommendation }}</h3>
+    </body>
+</html>

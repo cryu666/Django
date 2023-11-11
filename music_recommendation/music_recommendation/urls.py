@@ -14,14 +14,24 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
-# from app.recommender_collaborative import views as views_coll
+from app.recommender_collaborative import views as views_coll
+
 # from app.recommender_content import views as views_con
 # from app.user_management import views as views_user
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("knn/", views_coll.KNN),
+    path("svd/", views_coll.SVD),
+    path("", include("app.recommender_content.urls")),
+    path("", include("app.user_management.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
