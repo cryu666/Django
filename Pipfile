@@ -13,6 +13,15 @@ scipy = "*"
 fuzzywuzzy = "*"
 scikit-learn = "*"
 python-levenshtein = "*"
+psycopg = "*"
+psycopg2-binary = "*"
+spotipy = "*"
+matplotlib = "*"
+collection = "*"
+seaborn = "*"
+install = "*"
+opencv-python = "*"
+deepface = "*"
 
 [dev-packages]
 

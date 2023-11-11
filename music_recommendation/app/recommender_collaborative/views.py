@@ -14,20 +14,19 @@ from .models import UserBasedDataset
 
 # Create your views here.
 
+songs = UserBasedDataset.objects.all()
+df_songs = read_frame(songs)
 
-def index(request):
-    songs = UserBasedDataset.objects.all()
-    df_songs = read_frame(songs)
+# Filter users which have listen to at least 20 songs
+user_counts = df_songs.groupby("user_id")["song_id"].count()
+user_id_reduced = user_counts[user_counts > 20].index.to_list()
 
-    # Filter users which have listen to at least 20 songs
-    user_counts = df_songs.groupby("user_id")["song_id"].count()
-    user_id_reduced = user_counts[user_counts > 20].index.to_list()
+# Get songs which have been listened at least 20 times
+song_counts = df_songs.groupby("song_id")["user_id"].count()
+song_id_reduced = song_counts[song_counts > 20].index.to_list()
 
-    # Get songs which have been listened at least 20 times
-    song_counts = df_songs.groupby("song_id")["user_id"].count()
-    song_id_reduced = song_counts[song_counts > 20].index.to_list()
 
-    # KNN start
+def KNN(request):
 
     df_song_id_reduced = df_songs[
         df_songs["user_id"].isin(user_id_reduced)
@@ -64,7 +63,14 @@ def index(request):
     song = request.POST.get("song_input", "I believe in miracles")  # !!!!!!!!!
     knn_recommendation = model.make_recommendation(new_song=song, n_recommendations=10)
 
-    # SVD start
+    context = {
+        "knn_recommendation": knn_recommendation,
+    }
+
+    return render(request, "knn.html", context)  # type(context) should be dict
+
+
+def SVD(request):
 
     df_songs_reduced = df_songs[
         (df_songs["user_id"].isin(user_id_reduced))
@@ -92,8 +98,7 @@ def index(request):
     svd_recommendation = svd.topN_similar(x=userId, N=5, column="user")
 
     context = {
-        "knn_recommendation": knn_recommendation,
         "svd_recommendation": svd_recommendation,
     }
 
-    return render(request, "knn_test.html", context)  # type(context) should be dict
+    return render(request, "svd.html", context)

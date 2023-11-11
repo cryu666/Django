@@ -1,0 +1,20 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block content %}
+
+    <h2>Recommend Playlist for "{{mood}} Mood"</h2>
+    <div class="list-group">
+        {% for x in songs %}
+        <form method="POST" action="{% url 'songs'%}">
+            {% csrf_token %}
+            <input type="hidden" value="{{x.name}}" name="song_name"/>
+            <input type="hidden" value="{{x.year}}" name="song_date"/>
+            <button type="submit" class="list-group-item list-group-item-action"> {{x.name}}&emsp; 
+                by {{x.artists}}<br>
+                Year: {{x.year}}</button>
+        </form>    
+        {% endfor %}
+    </div>    
+
+{% endblock %}
