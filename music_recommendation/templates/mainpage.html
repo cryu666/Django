@@ -28,6 +28,7 @@
           </form>
     </div>
     <br>
+    {% if request.session.user_id %}
       <div class="btn-group1">
         <span> Similar User </span>
         {% for x in '12345' %}
@@ -37,13 +38,9 @@
           </form>
         {% endfor %}
       </div>
-      {% comment %} <div class="btn-group">
-        <span>Recommend Playlist</span>
-        <button style="width:150px" ><i class='fas fa-play'></i><br>Apple Playlist</button>
-        <button style="width:150px"><i class='fas fa-play'></i><br>Samsung Playlist</button>
-        <button style="width:150px"><i class='fas fa-play'></i><br>Sony Playlist</button>
-        <button style="width:150px"><i class='fas fa-play'></i><br>HTC Playlist</button>
-        <button style="width:150px"><i class='fas fa-play'></i><br>Apple Playlist</button>
-      </div> {% endcomment %}
+    {% else %}
+      </br></br></br></br>
+      <a style="font-size: 30px; color: #363636; font-weight:bold;" href="{% url 'login' %}">Sign in to access more features!</a>
+    {% endif %}
 </div>
 {% endblock %}
