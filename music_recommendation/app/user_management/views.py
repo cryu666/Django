@@ -8,32 +8,27 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
 
+from .models import Users
+
 
 def registerPage(request):
-    csv_file_path = os.path.join(os.path.dirname(__file__), "accounts.csv")
-
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
+            email = form.cleaned_data["email"]  # add email input in html
             username = form.cleaned_data["username"]
-            password = form.cleaned_data[
-                "password1"
-            ]  # Use password1 for the password field
+            password = form.cleaned_data["password1"]
 
-            # Check if the username already exists in the CSV file
-            with open(csv_file_path, "r") as file:
-                csv_reader = csv.DictReader(file)
-                for row in csv_reader:
-                    if row["username"] == username:
-                        messages.error(request, "用户名已存在")
-                        return render(request, "register.html", {"form": form})
+            # Check if the username already exists in the Users model
+            if Users.objects.filter(username=username).exists():
+                messages.error(request, 'Username "%s" is already in use.' % username)
+                return render(request, "register.html", {"form": form})
 
-            # Write the new user's account information to the CSV file
-            with open(csv_file_path, "a", newline="") as file:
-                csv_writer = csv.writer(file)
-                l = [username, password]
-                csv_writer.writerow(l)
-            messages.success(request, "注册成功，请登录")
+            # Write the new user's account information to the Users model
+            user = Users(username=username, password=password, email=email)
+            user.save()
+            print('User "%s" created' % username)
+            messages.success(request, "Registration successed. Please login.")
             return redirect("login")
     else:
         form = UserCreationForm()
@@ -42,22 +37,17 @@ def registerPage(request):
 
 
 def loginPage(request):
-    csv_file_path = os.path.join(os.path.dirname(__file__), "accounts.csv")
-
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
 
-        # 尝试验证用户
-        with open(csv_file_path, "r") as file:
-            csv_reader = csv.DictReader(file)
-            for row in csv_reader:
-                if row["username"] == username and row["password"] == password:
-                    request.session["user_id"] = username
-                    messages.success(request, "登录成功")
-                    return redirect("home")
+        user = Users.objects.get(username=username, password=password)
+        if user is not None:
+            request.session["user_id"] = user.user_id
+            messages.success(request, "Login successed.")
+            return redirect("home")
 
-        messages.error(request, "无效的用户名或密码")
+        messages.error(request, "Invalid username or password.")
         return redirect("login")
 
     return render(request, "login.html")
@@ -66,5 +56,5 @@ def loginPage(request):
 def logout_view(request):
     if "user_id" in request.session:
         del request.session["user_id"]
-        messages.success(request, "您已成功登出")
+        messages.success(request, "Logout successed.")
     return redirect("home")

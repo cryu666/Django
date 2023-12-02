@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # local apps
     "app.recommender_collaborative",
     "app.recommender_content",
     "app.user_management",
