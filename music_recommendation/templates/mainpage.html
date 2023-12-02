@@ -1,27 +1,49 @@
 {% extends 'base.html'%}
+{% load static %}
 
 {% block content %}
+<div class="main {% if request.session.user_id %} with-sidenav {% endif %}">
     {% if request.session.user_id %}
-        <h2>Hello {{ request.session.user_id }} !</h2>
-    {% else %}
-        <h2>Hello World !</h2>
+      <br>
+      <h1 style="font-size: 54px;">Hola, {{request.session.user_id}}!</h1>
+        <br>
     {% endif %}
-
-
+    <br>
     <div class="card">
-        <div class="card-header">Try this funtion:</div>
-        <div class="card-body">
-            <h4 class="card-title">Create Your Emotion Playlist!</h4>
-            <p class="card-text">Upload a picture of you</p>
-            
-            <form method="post" enctype="multipart/form-data" action="{% url 'emo' %}">
-                {% csrf_token %}
-                <input type="file" name="image">
-                <button class="btn btn-outline-primary" type="submit">Upload</button>
-            </form>
-            
-        </div>
+          <h4 class="card-title">Emotion Test</h4>
+          <span>
+              <i class="fa-regular fa-face-smile fa-bounce"></i>
+              <i class="fa-solid fa-face-sad-tear fa-fade"></i>
+              <i class="fa-regular fa-face-angry fa-shake"></i>
+              <i class="fa-solid fa-face-grin-squint fa-spin fa-spin-reverse"></i>
+          </span>
+          <p class="card-text">Create your personal emotion playlist.</p>
+          <form method="post" enctype="multipart/form-data" action="{% url 'emo' %}">
+              <div class="select-file">
+                  <span>Select Image</span>
+                  {% csrf_token %}
+                  <input type="file" name="image">
+              </div>
+              <button class="upload" type="submit">Upload  <i class="fa-solid fa-circle-up"></i></button>
+          </form>
+    </div>
+    <br>
+      <div class="btn-group1">
+        <span> Similar User </span>
+        {% for x in '12345' %}
+          <form method="post" action="{% url 'temp' %}">
+            {% csrf_token %}
+            <button style="width:150px" ><i class="fa-solid fa-user"></i><br>User {{x}}</button>
+          </form>
+        {% endfor %}
       </div>
-
-
+      {% comment %} <div class="btn-group">
+        <span>Recommend Playlist</span>
+        <button style="width:150px" ><i class='fas fa-play'></i><br>Apple Playlist</button>
+        <button style="width:150px"><i class='fas fa-play'></i><br>Samsung Playlist</button>
+        <button style="width:150px"><i class='fas fa-play'></i><br>Sony Playlist</button>
+        <button style="width:150px"><i class='fas fa-play'></i><br>HTC Playlist</button>
+        <button style="width:150px"><i class='fas fa-play'></i><br>Apple Playlist</button>
+      </div> {% endcomment %}
+</div>
 {% endblock %}

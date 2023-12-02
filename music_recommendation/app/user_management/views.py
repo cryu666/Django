@@ -24,17 +24,17 @@ def registerPage(request):
             with open(csv_file_path, "r") as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
-                    if row["username"] == username:
-                        messages.error(request, "用户名已存在")
-                        return render(request, "register.html", {"form": form})
-
+                    if row['username'] == username:
+                        messages.error(request, 'Username already exists.')
+                        return render(request, 'register.html', {'form': form})
+            
             # Write the new user's account information to the CSV file
             with open(csv_file_path, "a", newline="") as file:
                 csv_writer = csv.writer(file)
                 l = [username, password]
                 csv_writer.writerow(l)
-            messages.success(request, "注册成功，请登录")
-            return redirect("login")
+            messages.success(request, 'Registration successful, please log in.')
+            return redirect('login')
     else:
         form = UserCreationForm()
 
@@ -52,19 +52,18 @@ def loginPage(request):
         with open(csv_file_path, "r") as file:
             csv_reader = csv.DictReader(file)
             for row in csv_reader:
-                if row["username"] == username and row["password"] == password:
-                    request.session["user_id"] = username
-                    messages.success(request, "登录成功")
-                    return redirect("home")
-
-        messages.error(request, "无效的用户名或密码")
-        return redirect("login")
-
-    return render(request, "login.html")
-
+                if row['username'] == username and row['password'] == password:
+                    request.session['user_id'] = username
+                    messages.success(request, 'Login Successful.')
+                    return redirect('home')
+                
+        messages.error(request, 'Invalid username or password.')
+        return redirect('login')
+    
+    return render(request, 'login.html')
 
 def logout_view(request):
-    if "user_id" in request.session:
-        del request.session["user_id"]
-        messages.success(request, "您已成功登出")
-    return redirect("home")
+    if 'user_id' in request.session:
+        del request.session['user_id']
+        messages.success(request, 'You have successfully logged out.')
+    return redirect('home')
