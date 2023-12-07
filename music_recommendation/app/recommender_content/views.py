@@ -24,53 +24,45 @@ def search(request):
 
 
 def songs(request):
-    if request.method == 'POST':
-        name = request.POST['song_name']
-        date = request.POST['song_date']
-        year = int(date.split('-')[0])
-        songs = recommend_songs([{'name': name, 'year': year}], spotify_data)
+    if request.method == "POST":
+        name = request.POST["song_name"]
+        date = request.POST["song_date"]
+        year = int(date.split("-")[0])
+        songs = recommend_songs([{"name": name, "year": year}], spotify_data)
         context = {
-            "search": name, 
+            "search": name,
             "songs": songs,
-        }   
-    return render(request, 'content_based.html', context)
-        
+        }
+    return render(request, "content_based.html", context)
 
-def upload_img(request):  
-    if request.method == 'POST' and request.FILES['image']:
-        uploaded_image = request.FILES['image']
-        fs = FileSystemStorage(location=settings.STATICFILES_DIRS[0] + '/images')  
+
+def upload_img(request):
+    if request.method == "POST" and request.FILES["image"]:
+        uploaded_image = request.FILES["image"]
+        fs = FileSystemStorage(location=settings.STATICFILES_DIRS[0] + "/images")
         filename = fs.save(uploaded_image.name, uploaded_image)
-        image_url = settings.STATIC_URL + 'images/' + filename
-        img = cv2.imread(settings.STATICFILES_DIRS[0] + '/images/' + filename)
+        image_url = settings.STATIC_URL + "images/" + filename
+        img = cv2.imread(settings.STATICFILES_DIRS[0] + "/images/" + filename)
         emo_recom_dict = {
-                "angry": {'name':'Believer', 'year': 2017},
-                "disgust": {'name':'I Hate Everything About You', 'year': 2003},
-                "fear": {"name": "FEARLESS", "year": 2022},
-                "happy": {"name": "Die Young", "year": 2012},
-                "sad": {"name": "Lonely (with benny blanco)", "year": 2020},
-                "surprise": {"name": "Wow.", "year": 2019},
-                "neutral": {"name": "Not Angry", "year": 2020},
-            }
+            "angry": {"name": "Believer", "year": 2017},
+            "disgust": {"name": "I Hate Everything About You", "year": 2003},
+            "fear": {"name": "FEARLESS", "year": 2022},
+            "happy": {"name": "Die Young", "year": 2012},
+            "sad": {"name": "Lonely (with benny blanco)", "year": 2020},
+            "surprise": {"name": "Wow.", "year": 2019},
+            "neutral": {"name": "Not Angry", "year": 2020},
+        }
         try:
-            emotion = DeepFace.analyze(img, actions=['emotion'])
+            emotion = DeepFace.analyze(img, actions=["emotion"])
             mood = emotion[0]["dominant_emotion"][:]
             songs = recommend_songs([emo_recom_dict[mood]], spotify_data)
-            context = {
-                'mood': mood, 
-                'songs': songs
-            }  
-            return render(request, 'emotion_playlist.html', context)
+            context = {"mood": mood, "songs": songs}
+            return render(request, "emotion_playlist.html", context)
         except:
             pass
 
         finally:
-            if os.path.exists(settings.STATICFILES_DIRS[0] + '/images/' + filename):
-                os.remove(settings.STATICFILES_DIRS[0] + '/images/' + filename)
+            if os.path.exists(settings.STATICFILES_DIRS[0] + "/images/" + filename):
+                os.remove(settings.STATICFILES_DIRS[0] + "/images/" + filename)
 
-    return render(request, 'mainpage.html')
-
-
-
-
-
+    return render(request, "mainpage.html")

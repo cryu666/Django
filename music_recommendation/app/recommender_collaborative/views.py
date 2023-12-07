@@ -59,7 +59,7 @@ def KNN(request):
         data=mat_songs_features,
         decode_id_song=decode_id_song,
     )
-    song = request.POST.get("song_input") 
+    song = request.POST.get("song_input")
     knn_recommendation = model.make_recommendation(new_song=song, n_recommendations=10)
 
     context = {
@@ -102,6 +102,7 @@ def SVD(request):
     }
 
     return render(request, "svd.html", context)
+
 
 def temp(request):
     return render(request, "temp.html")

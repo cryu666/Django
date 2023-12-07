@@ -26,7 +26,10 @@ from app.recommender_collaborative import views as views_coll
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls, ),
+    path(
+        "admin/",
+        admin.site.urls,
+    ),
     path("knn/", views_coll.KNN, name="knn"),
     path("temp/", views_coll.temp, name="temp"),
     path("svd/", views_coll.SVD),
