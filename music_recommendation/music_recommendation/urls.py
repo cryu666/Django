@@ -26,8 +26,12 @@ from app.recommender_collaborative import views as views_coll
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("knn/", views_coll.KNN),
+    path(
+        "admin/",
+        admin.site.urls,
+    ),
+    path("knn/", views_coll.KNN, name="knn"),
+    path("temp/", views_coll.temp, name="temp"),
     path("svd/", views_coll.SVD),
     path("", include("app.recommender_content.urls")),
     path("", include("app.user_management.urls")),

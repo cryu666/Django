@@ -2,8 +2,12 @@
 {% load static %}
 
 {% block content %}
-<div class="main {% if request.session.user_id %} with-sidenav {% endif %}">  
-    <h1 class="title">Recommend playlist for "{{mood}} mood"</h2>
+<div class="main {% if request.session.user_id %} with-sidenav {% endif %}"> 
+    {% if incorrect %}
+    <h4>{{incorrect}}</h4>
+    {% else %}
+    <h1 class="title">Recommend Playlist for "{{search}}"</h1>
+
     <div class="list">
         {% for x in songs %}
             <button class="accordion"> {{x.name}} 
@@ -31,7 +35,7 @@
          
         {% endfor %}
     </div>    
-    
-</div> 
-
+    {% endif %}
+</div>  
+ 
 {% endblock %}

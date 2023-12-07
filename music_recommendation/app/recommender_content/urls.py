@@ -5,8 +5,8 @@ from . import views
 
 urlpatterns = [
     path("", views.home, name="home"),
-    path("songs/", views.songs, name="songs"),
+    path("content_based/", views.songs, name="songs"),
     path("upload_img/", views.upload_img, name="upload_img"),
-    path("emo/", views.upload_img, name="emo"),
+    path("emotion_playist/", views.upload_img, name="emo"),
     path("search/", views.search, name="search"),
 ]

@@ -1,5 +1,7 @@
-import csv
-import os
+import json
+import uuid
+from json import JSONEncoder
+from uuid import UUID
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -11,11 +13,18 @@ from django.shortcuts import redirect, render
 from .models import Users
 
 
+class UUIDEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, UUID):
+            # if the obj is uuid, we simply return the value of uuid
+            return obj.hex
+        return json.JSONEncoder.default(self, obj)
+
+
 def registerPage(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data["email"]  # add email input in html
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password1"]
 
@@ -25,7 +34,11 @@ def registerPage(request):
                 return render(request, "register.html", {"form": form})
 
             # Write the new user's account information to the Users model
-            user = Users(username=username, password=password, email=email)
+            user_id = str(uuid.uuid4())
+            print(user_id)
+            user = Users.objects.create(
+                user_id=user_id, username=username, password=password
+            )
             user.save()
             print('User "%s" created' % username)
             messages.success(request, "Registration successed. Please login.")
@@ -41,9 +54,13 @@ def loginPage(request):
         username = request.POST["username"]
         password = request.POST["password"]
 
-        user = Users.objects.get(username=username, password=password)
+        try:
+            user = Users.objects.get(username=username, password=password)
+        except Users.DoesNotExist:
+            user = None
+
         if user is not None:
-            request.session["user_id"] = user.user_id
+            request.session["username"] = user.username
             messages.success(request, "Login successed.")
             return redirect("home")
 
@@ -54,7 +71,7 @@ def loginPage(request):
 
 
 def logout_view(request):
-    if "user_id" in request.session:
-        del request.session["user_id"]
+    if "username" in request.session:
+        del request.session["username"]
         messages.success(request, "Logout successed.")
     return redirect("home")

@@ -1,4 +1,44 @@
-<html>
+{% extends 'base.html'%}
+{% load static %}
+
+{% block content %}
+<div class="main {% if request.session.user_id %} with-sidenav {% endif %}"> 
+    {% if incorrect %}
+    <h4>{{incorrect}}</h4>
+    {% else %}
+    <h1 class="title">See what users listening to "{{song}}" also like...</h1>
+    <div class="list">
+        {% for x in knn_recommendation %}
+            <button class="accordion"> {{x}} 
+                <div class="menuicon">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <p>artist</p> 
+            </button>
+            <div class="panel">
+                <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                <form method="POST" action="{% url 'songs'%}">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{x.name}}" name="song_name"/>
+                    <input type="hidden" value="{{x.year}}" name="song_date"/>
+                    <button type="submit <h3>{{ knn_recommendation }}</h3>"><i class="fa-solid fa-music"></i>&emsp;Recommend Playlist with Similar Songs</a>
+                </form>
+                <form method="POST" action="{% url 'knn'%}">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{x}}" name="song_input"/>
+                    <button href="#"><i class="fa-solid fa-headphones"></i>&emsp;Explore Similar Music Preferences of Listeners</button>
+                </form>
+            </div>
+         
+        {% endfor %}
+    </div>    
+    {% endif %}
+</div>  
+ 
+{% endblock %}
+{% comment %} <html>
     <head>
         <title>KNN test</title>
         <style>
@@ -21,4 +61,4 @@
 
         <h3>{{ knn_recommendation }}</h3>
     </body>
-</html>
+</html> {% endcomment %}

@@ -2,24 +2,27 @@
 {% load static %}
 
 {% block content %}
-   
-    <h2>Login</h2>
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    
+<div class="main">  
+    <div class="lr">
+    <h1 class='title'>Login</h1>
+
     <form method="post">
         {% csrf_token %}
-        <label for="username">Username</label>
+        <label for="username">Username:</label>
         <input type="text" name="username" id="username" required><br>
-        <label for="password">Password</label>
+        <label for="password">Password:</label>
         <input type="password" name="password" id="password" required><br>
-        <button type="submit" class="btn btn-primary">Login</button>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <button type="submit" class="btn">Login</button> 
     </form>
     
+    </div>
+</div>  
 
 {% endblock %}

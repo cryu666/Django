@@ -1,19 +1,36 @@
 {% extends 'base.html'%}
+{% load static %}
 
 {% block content %}
-    <h1>Search Results</h1>
-    <div class="list-group">
-
+<div class="main {% if request.session.user_id %} with-sidenav {% endif %}">  
+    <h1 class="title">Search Results</h1>
+    <div class="list">
         {% for x in tracks %}
-        <form method="POST" action="{% url 'songs'%}">
-            {% csrf_token %}
-            <input type="hidden" value="{{x.name}}" name="song_name"/>
-            <input type="hidden" value="{{x.album.release_date}}" name="song_date"/>
-            <button type="submit" class="list-group-item list-group-item-action"> {{x.name}}&emsp; 
-                by {% for y in x.artists %}"{{y.name}}"{% endfor %}<br>
-                Release date: {{x.album.release_date}}</button>
-        </form>    
+            <button class="accordion"> {{x.name}} 
+                <div class="menuicon">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <p>{% for y in x.artists %}"{{y.name}}"{% endfor %}</p> 
+            </button>
+            <div class="panel">
+                <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                <form method="POST" action="{% url 'songs'%}">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{x.name}}" name="song_name"/>
+                    <input type="hidden" value="{{x.album.release_date}}" name="song_date"/>
+                    <button type="submit"><i class="fa-solid fa-music"></i>&emsp;Recommend Playlist with Similar Songs</a>
+                </form>
+                <form method="POST" action="{% url 'knn'%}">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{x.name}}" name="song_input"/>
+                    <button href="#"><i class="fa-solid fa-headphones"></i>&emsp;Explore Similar Music Preferences of Listeners</button>
+                </form>
+            </div>
+         
         {% endfor %}
-    </div>    
+    </div> 
+</div>   
 
 {% endblock %}
