@@ -2,17 +2,21 @@
 {% load static %}
 
 {% block content %}
-<div class="main {% if request.session.user_id %} with-sidenav {% endif %}">  
-    <h1 class="title">Recommend playlist for "{{mood}} mood"</h2>
+<div class="main {% if request.session.user_id %} with-sidenav {% endif %}"> 
+    {% if incorrect %}
+    <h4>{{incorrect}}</h4>
+    {% else %}
+    <h1 class="title">Check out XXX's favorite tracks!</h1>
+
     <div class="list">
-        {% for x in songs %}
-            <button class="accordion"> {{x.name}} 
+        {% for x in 'xxxxxxxx' %}
+            <button class="accordion"> song name 
                 <div class="menuicon">
                     <div></div>
                     <div></div>
                     <div></div>
                 </div>
-                <p>{{x.artists}}</p> 
+                <p>artist</p> 
             </button>
             <div class="panel">
                 <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
@@ -31,7 +35,7 @@
          
         {% endfor %}
     </div>    
-    
-</div> 
-
+    {% endif %}
+</div>  
+ 
 {% endblock %}
