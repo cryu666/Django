@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="main {% if request.session.user_id %} with-sidenav {% endif %}"> 
+<div class="main {% if request.session.username %} with-sidenav {% endif %}"> 
     {% if incorrect %}
     <h4>{{incorrect}}</h4>
     {% else %}
