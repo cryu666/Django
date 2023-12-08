@@ -2,10 +2,10 @@
 {% load static %}
 
 {% block content %}
-<div class="main {% if request.session.user_id %} with-sidenav {% endif %}">
-    {% if request.session.user_id %}
+<div class="main {% if request.session.username %} with-sidenav {% endif %}">
+    {% if request.session.username %}
       <br>
-      <h1 style="font-size: 54px;">Hola, {{request.session.user_id}}!</h1>
+      <h1 style="font-size: 54px;">Hola, {{request.session.username}}!</h1>
         <br>
     {% endif %}
     <br>
@@ -28,7 +28,7 @@
           </form>
     </div>
     <br>
-    {% if request.session.user_id %}
+    {% if request.session.username %}
       <div class="btn-group1">
         <span> Similar User </span>
         {% for x in '12345' %}

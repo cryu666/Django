@@ -14,7 +14,7 @@
   <body>
     <div class="topnav" id="navbar">
       <a class="active" href="{% url 'home' %}">nycu DIF</a>
-      {% if request.session.user_id %}
+      {% if request.session.username %}
         <a class="nav-link" href="{% url 'logout' %}"> Logout</a>
       {% else %}
         <a href="{% url 'login' %}">Login</a>
@@ -47,7 +47,7 @@
       </div>
   </div>
 
-  {% if request.session.user_id %}
+  {% if request.session.username %}
   <div class="sidenav">
     <span> My favorite tracks </span>
     
