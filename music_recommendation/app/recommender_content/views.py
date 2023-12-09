@@ -17,6 +17,7 @@ def home(request):
 
 
 def search(request):
+    tracks = []
     if request.method == "POST":
         input_string = request.POST["string"]
         tracks = search_song(input_string)
