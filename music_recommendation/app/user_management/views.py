@@ -90,7 +90,12 @@ def loginPage(request):
 def logout_view(request):
     if "username" in request.session:
         del request.session["username"]
-        del request.session["user_id"]
+
+        if "user_id" in request.session:
+            del request.session["user_id"]
+
         messages.success(request, "Logout successed.")
+
     return redirect("home")
+
 
