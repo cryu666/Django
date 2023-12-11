@@ -20,6 +20,7 @@
                         <button type="submit"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
                         <input type="hidden" value="{{x.name}}" name="song_name"/>
                         <input type="hidden" value="{% for y in x.artists %}{{y.name}}{% endfor %}" name="artist_name"/>
+                        <input type="hidden" value="{{x.album.release_date}}" name="song_date"/>
                 </form>
                 <!-- <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button> -->
                 <form method="POST" action="{% url 'songs'%}">

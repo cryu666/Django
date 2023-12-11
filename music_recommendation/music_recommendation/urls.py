@@ -35,7 +35,7 @@ urlpatterns = [
     path("svd/", views_coll.SVD),
     path("", include("app.recommender_content.urls")),
     path("", include("app.user_management.urls")),
-    path("", include("app.renew_table.urls")),
+    path("", include("app.renew_artist_song_playlist.urls")),
 ]
 
 if settings.DEBUG:
