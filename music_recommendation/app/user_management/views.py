@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
 
-from .models import Users, Playlist
+from .models import Users, Playlist, Artist, Song
 
 
 class UUIDEncoder(json.JSONEncoder):
@@ -63,12 +63,12 @@ def loginPage(request):
             request.session["username"] = user.username
             request.session["user_id"] = str(user.user_id)
 
-            playlist_query = Playlist.objects.filter(user=request.session["user_id"])
+            playlist_query = Playlist.objects.filter(user_id=request.session["user_id"])
 
             playlist_info = []
             for playlist_entry in playlist_query:
-                song = playlist_entry.song
-                artist = song.artist
+                song = Song.objects.get(song_id=playlist_entry.song_id) 
+                artist = Artist.objects.get(artist_id=song.artist_id)
                 playlist_info.append({
                     'song_title': song.title,
                     'artist_name': artist.artist_name,

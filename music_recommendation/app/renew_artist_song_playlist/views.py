@@ -50,7 +50,7 @@ def add_song(request):
 
         try:
             # Does the playlist exist? Which means whether user listend to any song.
-            playlist = Playlist.objects.get(user_id=user_id)
+            playlist = Playlist.objects.filter(user_id=user_id).first()
             playlist_id = playlist.playlist_id
             try:
                 playlist = Playlist.objects.get(song_id_playlist=song_id, user_id=user_id)
