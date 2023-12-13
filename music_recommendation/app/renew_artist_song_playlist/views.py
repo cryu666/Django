@@ -39,13 +39,13 @@ def add_song(request):
             
         # 更新歌曲資料庫
         try:
-            song = Song.objects.get(artist_id_song=artist_id, title=song_name)
+            song = Song.objects.get(artist_id=artist_id, title=song_name)
             song_id = song.song_id
             print("Song is found, skip creating")
         except Song.DoesNotExist: 
             print("Song is not found, creating a new song info")
             song_id = str(uuid.uuid4())
-            song = Song.objects.create(artist_id_song=artist_id, title=song_name, song_id=song_id, year=year)
+            song = Song.objects.create(artist_id=artist_id, title=song_name, song_id=song_id, year=year)
             song.save()
 
         try:
@@ -53,7 +53,7 @@ def add_song(request):
             playlist = Playlist.objects.filter(user_id=user_id).first()
             playlist_id = playlist.playlist_id
             try:
-                playlist = Playlist.objects.get(song_id_playlist=song_id, user_id=user_id)
+                playlist = Playlist.objects.get(song_id=song_id, user_id=user_id)
                 playlist.listen_count += 1
                 playlist.save()
                 print("1 User listened to this song before, just add listen count")
@@ -61,16 +61,28 @@ def add_song(request):
                 print("2 User do have playlist, but doesn't listen to this song before")
                 record_id = str(uuid.uuid4())
                 listen_count = 1
-                playlist = Playlist.objects.create(record_id=record_id, playlist_id=playlist_id, user_id=user_id, song_id_playlist=song_id, listen_count=listen_count)
+                playlist = Playlist.objects.create(record_id=record_id, playlist_id=playlist_id, user_id=user_id, song_id=song_id, listen_count=listen_count)
                 playlist.save()
         except Playlist.DoesNotExist: 
             print("3 User never listened to any song before, so we need to create a new playlist")
             playlist_id = str(uuid.uuid4())
             record_id = str(uuid.uuid4())
             listen_count = 1
-            playlist = Playlist.objects.create(record_id=record_id, playlist_id=playlist_id, user_id=user_id, song_id_playlist=song_id, listen_count=listen_count)
+            playlist = Playlist.objects.create(record_id=record_id, playlist_id=playlist_id, user_id=user_id, song_id=song_id, listen_count=listen_count)
             playlist.save()
-            
+
+        playlist_query = Playlist.objects.filter(user_id=user_id)
+        playlist_info = []
+        for playlist_entry in playlist_query:
+            song = Song.objects.get(song_id=playlist_entry.song_id) 
+            artist = Artist.objects.get(artist_id=song.artist_id)
+            playlist_info.append({
+                'song_title': song.title,
+                'artist_name': artist.artist_name,
+                'year': song.year,
+            })
+        request.session['user_playlist'] = playlist_info 
+
         return redirect("search")
     # return render(request, "search.html")
     return redirect("search")

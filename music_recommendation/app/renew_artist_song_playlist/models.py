@@ -20,7 +20,7 @@ class Artist(models.Model):
 
 class Song(models.Model):
     song_id = models.UUIDField(db_column="Song_ID", primary_key=True)
-    artist_id_song = models.UUIDField(db_column="Artist_ID")
+    artist_id = models.UUIDField(db_column="Artist_ID")
     title = models.CharField(db_column="Title", blank=True, null=True)
     year = models.CharField(db_column="Year", blank=True, null=True)
     class Meta:
@@ -30,7 +30,7 @@ class Song(models.Model):
 class Playlist(models.Model):
     record_id = models.UUIDField(db_column="Record_ID", primary_key=True)
     playlist_id = models.UUIDField(db_column="Playlist_ID")
-    song_id_playlist = models.UUIDField(db_column="Song_ID")
+    song_id = models.UUIDField(db_column="Song_ID")
     user_id = models.UUIDField(db_column="User_ID")
     listen_count = models.CharField(db_column="Listen_Count", blank=True, null=True)
     class Meta:
