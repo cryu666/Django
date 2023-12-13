@@ -14,7 +14,7 @@
   <body>
     <div class="topnav" id="navbar">
       <a class="active" href="{% url 'home' %}">nycu DIF</a>
-      {% if request.session.user_id %}
+      {% if request.session.username %}
         <a class="nav-link" href="{% url 'logout' %}"> Logout</a>
       {% else %}
         <a href="{% url 'login' %}">Login</a>
@@ -40,24 +40,30 @@
         <div class="footer-song-name">Song name</div>
         <div class="footer-song-artist">Artist</div>
       </div>
-      <div class="footer-icon">
+      <div class="footer-icon {% if request.session.username %} with-sidenav {% endif %}">
         <i class="fa-solid fa-backward-step"></i>
         <i class="fa-regular fa-circle-play"></i>
         <i class="fa-solid fa-forward-step"></i>
       </div>
   </div>
 
-  {% if request.session.user_id %}
+  {% if request.session.username %}
   <div class="sidenav">
-    <span> My favorite tracks </span>
+    <span> {{ user_id }}My favorite tracks </span>
     
     <div class="fav">
-        {% for x in "aaaaaaaaaa" %}
-        <form method="POST" action="{% url 'songs'%}">
-            {% csrf_token %}
-            <button type="submit"> Song Name <p>artist</p> </button>
-        </form>   
-        {% endfor %}
+        {% if request.session.user_playlist %}
+          {% for entry in request.session.user_playlist %}
+            <form method="POST" action="{% url 'search'%}">
+              {% csrf_token %}
+              <input type="hidden" value="{{entry.song_title}}+{{entry.artist_name}}" name="string"/>
+                <button type="submit"> {{ entry.song_title }} <p>{{ entry.artist_name }}</p> </button>
+            </form>   
+          {% endfor %}
+        {% else %}
+          <button ><p> You haven't added any songs yet.</p> </button>
+        {% endif %}
+        
     </div>
   </div>
   {% endif %}

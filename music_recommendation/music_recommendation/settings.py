@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "app.recommender_collaborative",
     "app.recommender_content",
     "app.user_management",
+    "app.renew_artist_song_playlist",
 ]
 
 MIDDLEWARE = [

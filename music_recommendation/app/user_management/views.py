@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
 
-from .models import Users
+from .models import Users, Playlist, Artist, Song
 
 
 class UUIDEncoder(json.JSONEncoder):
@@ -61,6 +61,23 @@ def loginPage(request):
 
         if user is not None:
             request.session["username"] = user.username
+            request.session["user_id"] = str(user.user_id)
+
+            playlist_query = Playlist.objects.filter(user_id=request.session["user_id"])
+
+            playlist_info = []
+            for playlist_entry in playlist_query:
+                song = Song.objects.get(song_id=playlist_entry.song_id) 
+                artist = Artist.objects.get(artist_id=song.artist_id)
+                playlist_info.append({
+                    'song_title': song.title,
+                    'artist_name': artist.artist_name,
+                    'year': song.year,
+                })
+
+            request.session['user_playlist'] = playlist_info
+
+
             messages.success(request, "Login successed.")
             return redirect("home")
 
@@ -73,5 +90,12 @@ def loginPage(request):
 def logout_view(request):
     if "username" in request.session:
         del request.session["username"]
+
+        if "user_id" in request.session:
+            del request.session["user_id"]
+
         messages.success(request, "Logout successed.")
+
     return redirect("home")
+
+

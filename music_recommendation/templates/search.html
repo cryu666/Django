@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="main {% if request.session.user_id %} with-sidenav {% endif %}">  
+<div class="main {% if request.session.username %} with-sidenav {% endif %}">  
     <h1 class="title">Search Results</h1>
     <div class="list">
         {% for x in tracks %}
@@ -15,7 +15,14 @@
                 <p>{% for y in x.artists %}"{{y.name}}"{% endfor %}</p> 
             </button>
             <div class="panel">
-                <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                <form method="POST" action="{% url 'add_song' %}">
+                    {% csrf_token %}
+                        <button type="submit"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                        <input type="hidden" value="{{x.name}}" name="song_name"/>
+                        <input type="hidden" value="{% for y in x.artists %}{{y.name}}{% endfor %}" name="artist_name"/>
+                        <input type="hidden" value="{{x.album.release_date}}" name="song_date"/>
+                </form>
+                <!-- <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button> -->
                 <form method="POST" action="{% url 'songs'%}">
                     {% csrf_token %}
                     <input type="hidden" value="{{x.name}}" name="song_name"/>

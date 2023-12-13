@@ -21,7 +21,6 @@ body {
     background-color: #EBD564;
     overflow-x: hidden;
     padding-top: 20px;
-    padding-bottom: 100px;
 }
     
 .sidenav span {
@@ -31,6 +30,10 @@ body {
     font-size: 25px;
     color: #363636;
     display: block;
+}
+
+.fav{
+  margin-bottom: 25px;
 }
 
 .fav button {
@@ -559,3 +562,9 @@ body {
   padding: 20px;
   margin-bottom: 100px;
 }
+
+.footer-icon.with-sidenav {
+  font-size: 30px;
+  color: #fff;
+  margin: 5px 0px 0px 263px;
+ }
