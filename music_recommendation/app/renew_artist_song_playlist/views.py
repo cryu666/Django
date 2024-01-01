@@ -6,7 +6,7 @@ from uuid import UUID
 # # Create your views here.
 # from django.contrib.auth.forms import AddSongForm
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Users, Artist, Song, Playlist
@@ -14,16 +14,19 @@ from .models import Users, Artist, Song, Playlist
 def add_song(request):
     if request.method == 'POST':
         song_name = request.POST.get('song_name')
+        print(song_name)
         artist_name = request.POST.get('artist_name')
+        print(artist_name)
         date = request.POST.get('song_date')
+        print(date)
         year = int(date.split("-")[0])
-
+        print(year)
         username = request.session.get('username', None)
         user = Users.objects.get(username=username)
         user_id = user.user_id
-        print(song_name)
-        print(artist_name)
-        print(year)
+        # print(song_name)
+        # print(artist_name)
+        # print(year)
 
         # 更新藝人資料庫
         try:
@@ -83,6 +86,13 @@ def add_song(request):
             })
         request.session['user_playlist'] = playlist_info 
 
+        referer = request.META.get('HTTP_REFERER')
+        # if referer is not None:
+        #     print("redirect to original URL: %s", referer)
+        #     return HttpResponseRedirect(referer)
+        # else:
+            # print("redirect to homepage")
         return redirect("search")
+            
     # return render(request, "search.html")
     return redirect("search")
