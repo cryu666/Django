@@ -8,28 +8,22 @@
     {% else %}
     <h1 class="title">See what users listening to "{{song}}" also like...</h1>
     <div class="list">
-        {% for x in knn_recommendation %}
-            <button class="accordion"> {{x}} 
+        {% for song, artist, year in knn_recommendation %}
+            <button class="accordion"> {{song}} 
                 <div class="menuicon">
                     <div></div>
                     <div></div>
                     <div></div>
                 </div>
-                <p>artist</p> 
+                <p>{{artist}}</p> 
             </button>
             <div class="panel">
-                <form method="POST" action="{% url 'add_song' %}">
-                    {% csrf_token %}
-                        <button type="submit"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
-                        <input type="hidden" value="{{x.name}}" name="song_name"/>
-                        <input type="hidden" value="{{x.artists}}" name="artist_name"/>
-                        <input type="hidden" value="{{x.year}}" name="song_date"/>
-                </form>
+                <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
                 <form method="POST" action="{% url 'songs'%}">
                     {% csrf_token %}
-                    <input type="hidden" value="{{x.name}}" name="song_name"/>
-                    <input type="hidden" value="{{x.year}}" name="song_date"/>
-                    <button type="submit <h3>{{ knn_recommendation }}</h3>"><i class="fa-solid fa-music"></i>&emsp;Recommend Playlist with Similar Songs</a>
+                    <input type="hidden" value="{{song}}" name="song_name"/>
+                    <input type="hidden" value="{{year}}" name="song_date"/>
+                    <button type="submit"><i class="fa-solid fa-music"></i>&emsp;Recommend Playlist with Similar Songs</a>
                 </form>
                 <form method="POST" action="{% url 'knn'%}">
                     {% csrf_token %}

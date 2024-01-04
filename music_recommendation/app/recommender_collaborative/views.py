@@ -59,13 +59,20 @@ def KNN(request):
         data=mat_songs_features,
         decode_id_song=decode_id_song,
     )
-    
     song = request.POST.get("song_input")
     knn_recommendation = model.make_recommendation(new_song=song, n_recommendations=10)
 
+    recommended_artists = []
+    recommended_years = []
+
+    for recommended_song in knn_recommendation:
+        song_info = df_songs[df_songs["title"] == recommended_song].iloc[0]
+        recommended_artists.append(song_info["artist_name"])
+        recommended_years.append(song_info["year"])
+
     context = {
         "song": song,
-        "knn_recommendation": knn_recommendation,
+        "knn_recommendation": zip(knn_recommendation, recommended_artists, recommended_years),
     }
 
     return render(request, "knn.html", context)  # type(context) should be dict

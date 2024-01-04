@@ -20,7 +20,8 @@ def search(request):
     tracks = []
     if request.method == "POST":
         input_string = request.POST["string"]
-        tracks = search_song(input_string)
+        request.session["string"] = input_string
+    tracks = search_song(request.session["string"])
     return render(request, "search.html", {"tracks": tracks})
 
 
@@ -29,17 +30,35 @@ def songs(request):
         name = request.POST["song_name"]
         date = request.POST["song_date"]
         year = int(date.split("-")[0])
+        
         songs = recommend_songs([{"name": name, "year": year}], spotify_data)
+       
+        # Iterate through each song and modify the 'artists' key
+        for song in songs:
+            # Extracting the artist names from the string representation of the list
+            artists_str = song['artists'][1:-1]  # Removing the square brackets
+            artists_list = [artist.strip()[1:-1] for artist in artists_str.split(',')]
+
+            # Joining the artist names into a comma-separated string
+            artists_display = ', '.join(artists_list)
+
+            # Update the 'artists' key in the dictionary
+            song['artists'] = artists_display
+
         context = {
             "search": name,
             "songs": songs,
         }
+
     return render(request, "content_based.html", context)
 
 
 def upload_img(request):
-    if request.method == "POST" and request.FILES["image"]:
-        uploaded_image = request.FILES["image"]
+    if request.method == "POST":
+        uploaded_image = request.FILES.get("image")
+        if uploaded_image is None:
+            return render(request, "mainpage.html", {'message': 'Please select an image.'})
+        
         fs = FileSystemStorage(location=settings.STATICFILES_DIRS[0] + "/images")
         filename = fs.save(uploaded_image.name, uploaded_image)
         image_url = settings.STATIC_URL + "images/" + filename
@@ -57,10 +76,24 @@ def upload_img(request):
             emotion = DeepFace.analyze(img, actions=["emotion"])
             mood = emotion[0]["dominant_emotion"][:]
             songs = recommend_songs([emo_recom_dict[mood]], spotify_data)
+
+            # Iterate through each song and modify the 'artists' key
+            for song in songs:
+                # Extracting the artist names from the string representation of the list
+                artists_str = song['artists'][1:-1]  # Removing the square brackets
+                artists_list = [artist.strip()[1:-1] for artist in artists_str.split(',')]
+
+                # Joining the artist names into a comma-separated string
+                artists_display = ', '.join(artists_list)
+
+                # Update the 'artists' key in the dictionary
+                song['artists'] = artists_display
+
             context = {"mood": mood, "songs": songs}
+
             return render(request, "emotion_playlist.html", context)
         except:
-            pass
+            return render(request, "mainpage.html", {'message': 'Please upload a clear personal photo of your face.'})
 
         finally:
             if os.path.exists(settings.STATICFILES_DIRS[0] + "/images/" + filename):

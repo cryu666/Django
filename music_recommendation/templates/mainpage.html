@@ -43,4 +43,11 @@
       <a style="font-size: 30px; color: #363636; font-weight:bold;" href="{% url 'login' %}">Sign in to access more features!</a>
     {% endif %}
 </div>
+
+<script>
+  // Display an alert if the error message is present
+  {% if message %}
+      alert("{{ message }}");
+  {% endif %}
+</script>
 {% endblock %}
