@@ -53,8 +53,8 @@ def add_song(request):
 
         try:
             # Does the playlist exist? Which means whether user listend to any song.
-            playlist = Playlist.objects.filter(user_id=user_id).first()
-            playlist_id = playlist.playlist_id
+            if not Playlist.objects.filter(user_id=user_id):
+                playlist = Playlist.objects.get(user_id=user_id)
             try:
                 playlist = Playlist.objects.get(song_id=song_id, user_id=user_id)
                 playlist.listen_count += 1
@@ -62,6 +62,8 @@ def add_song(request):
                 print("1 User listened to this song before, just add listen count")
             except Playlist.DoesNotExist:
                 print("2 User do have playlist, but doesn't listen to this song before")
+                playlist = Playlist.objects.filter(user_id=user_id).first()
+                playlist_id = playlist.playlist_id
                 record_id = str(uuid.uuid4())
                 listen_count = 1
                 playlist = Playlist.objects.create(record_id=record_id, playlist_id=playlist_id, user_id=user_id, song_id=song_id, listen_count=listen_count)
