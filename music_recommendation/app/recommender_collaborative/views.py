@@ -10,47 +10,59 @@ from sklearn.model_selection import train_test_split
 
 from .model.knn_recommender import KNNRecommender
 from .model.svd_recommender import SVDRecommender
-from .models import UserBasedDataset
+from .models import Playlist, Song, UserBasedDataset
 
 # Create your views here.
 
-songs = UserBasedDataset.objects.all()
-df_songs = read_frame(songs)
+playlist = Playlist.objects.all()
+song_info = Song.objects.all()
 
-# Filter users which have listen to at least 20 songs
-user_counts = df_songs.groupby("user_id")["song_id"].count()
-user_id_reduced = user_counts[user_counts > 20].index.to_list()
+df_playlist = read_frame(playlist)
+df_song_info = read_frame(song_info)
 
-# Get songs which have been listened at least 20 times
-song_counts = df_songs.groupby("song_id")["user_id"].count()
-song_id_reduced = song_counts[song_counts > 20].index.to_list()
+# df_playlist.to_csv('df_playlist.csv')
+# df_song_info.to_csv('df_song_info.csv')
 
+df_playlist = df_playlist[['user', 'song', 'listen_count']]
+df_song_info = df_song_info[['song_id', 'title']]
+
+df_playlist[['user', 'song']] = df_playlist[['user', 'song']].astype("string")
+df_song_info[['song_id', 'title']] = df_song_info[['song_id', 'title']].astype("string")
+
+df_playlist['song'] = df_playlist['song'].str.extract(r"\((.*?)\)" , expand=False)
+df_playlist['user'] = df_playlist['user'].str.extract(r"\((.*?)\)" , expand=False)
+
+df_playlist_actual = df_playlist.drop_duplicates(subset=['song', 'user'], keep=False)
+
+df_songs = pd.merge(
+    df_playlist_actual, df_song_info, left_on="song", right_on="song_id", how="left"
+)
+df_songs = df_songs[["song", "user", "listen_count", "title"]]
+# df_songs.to_csv('df_songs.csv')
 
 def KNN(request):
-    df_song_id_reduced = df_songs[
-        df_songs["user_id"].isin(user_id_reduced)
-    ].reset_index(drop=True)
+    df_song_id_reduced = df_songs.reset_index(drop=True)
 
     # convert the dataframe into a pivot table
     df_songs_features = df_song_id_reduced.pivot(
-        index="song_id", columns="user_id", values="listen_count"
+        index="song", columns="user", values="listen_count"
     ).fillna(0)
 
     # obtain a sparse matrix
     mat_songs_features = csr_matrix(df_songs_features.values)
 
-    df_unique_songs = df_songs.drop_duplicates(subset=["song_id"]).reset_index(
-        drop=True
-    )[["song_id", "title"]]
+    df_unique_songs = df_songs.drop_duplicates(subset=["song"]).reset_index(drop=True)[
+        ["song", "title"]
+    ]
 
     decode_id_song = {
         song: i
         for i, song in enumerate(
-            list(
-                df_unique_songs.set_index("song_id").loc[df_songs_features.index].title
-            )
+            list(df_unique_songs.set_index("song").loc[df_songs_features.index].title)
         )
     }
+
+    test_dict = dict(zip(df_unique_songs.song, df_unique_songs.title))
 
     model = KNNRecommender(
         metric="cosine",
@@ -84,10 +96,7 @@ def KNN(request):
 
 def SVD(request):
 
-    df_songs_reduced = df_songs[
-        (df_songs["user_id"].isin(user_id_reduced))
-        & (df_songs["song_id"].isin(song_id_reduced))
-    ].reset_index(drop=True)[["user_id", "song_id", "listen_count"]]
+    df_songs_reduced = df_songs.reset_index(drop=True)[["song", "user", "listen_count"]]
     df_songs_reduced["listen_count"] = 1
 
     svd = SVDRecommender(no_of_features=8)
@@ -97,7 +106,7 @@ def SVD(request):
     # Creates the user-item matrix, the user_id on the rows and the song_id on the columns.
     user_item_matrix, users, items = svd.create_utility_matrix(
         train,
-        formatizer={"user": "user_id", "item": "song_id", "value": "listen_count"},
+        formatizer={"user": "user", "item": "song", "value": "listen_count"},
     )
 
     # fits the svd model to the matrix data.
@@ -105,7 +114,7 @@ def SVD(request):
 
     # outputs N most similar users to user with user_id x
     userId = request.POST.get(
-        "userId_input", "b80344d063b5ccb3212f76538f3d9e43d87dca9e"
+        "userId_input", "7791528f-1ae9-429d-beb1-97ecdb006843"
     )  # !!!!!!!!!
     svd_recommendation = svd.topN_similar(x=userId, N=5, column="user")
 
