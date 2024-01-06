@@ -37,11 +37,13 @@ body {
 }
 
 .fav button {
+    overflow: auto;
     font-family: 'Montserrat', sans-serif;
     display: block;
     background-color: inherit;
     color: black;
     padding: 18px 40px;
+    padding-right:30px;
     width: 100%;
     border: none;
     outline: none;

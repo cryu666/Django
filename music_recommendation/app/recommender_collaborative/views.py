@@ -59,8 +59,12 @@ def KNN(request):
         data=mat_songs_features,
         decode_id_song=decode_id_song,
     )
-    song = request.POST.get("song_input")
-    knn_recommendation = model.make_recommendation(new_song=song, n_recommendations=10)
+
+    if request.method == "POST":
+        song = request.POST.get("song_input")
+        request.session["song"] = song
+
+    knn_recommendation = model.make_recommendation(new_song= request.session["song"], n_recommendations=10)
 
     recommended_artists = []
     recommended_years = []
@@ -71,7 +75,7 @@ def KNN(request):
         recommended_years.append(song_info["year"])
 
     context = {
-        "song": song,
+        "song": request.session["song"],
         "knn_recommendation": zip(knn_recommendation, recommended_artists, recommended_years),
     }
 

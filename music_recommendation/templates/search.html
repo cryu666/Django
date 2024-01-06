@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="main {% if request.session.username %} with-sidenav {% endif %}">  
-    <h1 class="title">Search Results</h1>
+    <h1 class="title">Search Results for "{{request.session.string}}"</h1>
     <div class="list">
         {% for x in tracks %}
             <button class="accordion"> {{x.name}} 

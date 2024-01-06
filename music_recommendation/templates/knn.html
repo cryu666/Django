@@ -6,7 +6,7 @@
     {% if incorrect %}
     <h4>{{incorrect}}</h4>
     {% else %}
-    <h1 class="title">See what users listening to "{{song}}" also like...</h1>
+    <h1 class="title">See what users listening to "{{request.session.song}}" also like...</h1>
     <div class="list">
         {% for song, artist, year in knn_recommendation %}
             <button class="accordion"> {{song}} 
@@ -18,7 +18,13 @@
                 <p>{{artist}}</p> 
             </button>
             <div class="panel">
-                <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                <form method="POST" action="{% url 'add_song' %}">
+                    {% csrf_token %}
+                        <button type="submit"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                        <input type="hidden" value="{{song}}" name="song_name"/>
+                        <input type="hidden" value="{{artist}}" name="artist_name"/>
+                        <input type="hidden" value="{{year}}" name="song_date"/>
+                </form>
                 <form method="POST" action="{% url 'songs'%}">
                     {% csrf_token %}
                     <input type="hidden" value="{{song}}" name="song_name"/>

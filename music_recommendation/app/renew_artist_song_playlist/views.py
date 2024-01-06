@@ -89,12 +89,8 @@ def add_song(request):
         request.session['user_playlist'] = playlist_info 
 
         referer = request.META.get('HTTP_REFERER')
-        # if referer is not None:
-        #     print("redirect to original URL: %s", referer)
-        #     return HttpResponseRedirect(referer)
-        # else:
-            # print("redirect to homepage")
-        return redirect("search")
-            
-    # return render(request, "search.html")
-    return redirect("search")
+        if referer is not None:
+            print("redirect to original URL: %s", referer)
+            return HttpResponseRedirect(referer)
+        else:
+            return redirect("home")
