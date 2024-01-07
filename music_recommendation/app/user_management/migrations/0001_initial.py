@@ -21,7 +21,10 @@ class Migration(migrations.Migration):
                 ),
                 ("artist_name", models.CharField(db_column="Artist_Name")),
             ],
-            options={"db_table": "ARTIST", "managed": False,},
+            options={
+                "db_table": "ARTIST",
+                "managed": False,
+            },
         ),
         migrations.CreateModel(
             name="Playlist",
@@ -37,7 +40,10 @@ class Migration(migrations.Migration):
                 ),
                 ("playlist_id", models.UUIDField(db_column="Playlist_ID")),
             ],
-            options={"db_table": "PLAYLIST", "managed": False,},
+            options={
+                "db_table": "PLAYLIST",
+                "managed": False,
+            },
         ),
         migrations.CreateModel(
             name="Song",
@@ -52,7 +58,10 @@ class Migration(migrations.Migration):
                 ("listen_count", models.IntegerField(db_column="Listen_Count")),
                 ("year", models.CharField(db_column="Year")),
             ],
-            options={"db_table": "SONG", "managed": False,},
+            options={
+                "db_table": "SONG",
+                "managed": False,
+            },
         ),
         migrations.CreateModel(
             name="Users",
@@ -72,6 +81,9 @@ class Migration(migrations.Migration):
                     models.CharField(blank=True, db_column="Password", null=True),
                 ),
             ],
-            options={"db_table": "USERS", "managed": False,},
+            options={
+                "db_table": "USERS",
+                "managed": False,
+            },
         ),
     ]

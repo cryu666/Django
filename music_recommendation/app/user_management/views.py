@@ -5,12 +5,11 @@ from uuid import UUID
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-
 # Create your views here.
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
 
-from .models import Users, Playlist, Artist, Song
+from .models import Artist, Playlist, Song, Users
 
 
 class UUIDEncoder(json.JSONEncoder):
@@ -67,16 +66,17 @@ def loginPage(request):
 
             playlist_info = []
             for playlist_entry in playlist_query:
-                song = Song.objects.get(song_id=playlist_entry.song_id) 
+                song = Song.objects.get(song_id=playlist_entry.song_id)
                 artist = Artist.objects.get(artist_id=song.artist_id)
-                playlist_info.append({
-                    'song_title': song.title,
-                    'artist_name': artist.artist_name,
-                    'year': song.year,
-                })
+                playlist_info.append(
+                    {
+                        "song_title": song.title,
+                        "artist_name": artist.artist_name,
+                        "year": song.year,
+                    }
+                )
 
-            request.session['user_playlist'] = playlist_info
-
+            request.session["user_playlist"] = playlist_info
 
             messages.success(request, "Login successed.")
             return redirect("home")
@@ -97,5 +97,3 @@ def logout_view(request):
         messages.success(request, "Logout successed.")
 
     return redirect("home")
-
-

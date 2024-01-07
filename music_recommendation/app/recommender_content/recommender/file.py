@@ -12,10 +12,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from app.recommender_content.models import (
-    ContentBasedSongGenres,
-    ContentBasedStyleGenres,
-)
+from app.recommender_content.models import (ContentBasedSongGenres,
+                                            ContentBasedStyleGenres)
 
 spotify_data = pd.DataFrame(list(ContentBasedSongGenres.objects.all().values()))
 

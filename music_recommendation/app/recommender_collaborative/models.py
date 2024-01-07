@@ -3,15 +3,33 @@ from django.db import models
 # Create your models here.
 
 
-class UserBasedDataset(models.Model):
-    user_id = models.CharField(primary_key=True, blank=True)
-    song_id = models.CharField(blank=True, null=True)
-    listen_count = models.IntegerField(blank=True, null=True)
-    title = models.CharField(blank=True, null=True)
-    release = models.CharField(blank=True, null=True)
-    artist_name = models.CharField(blank=True, null=True)
-    year = models.IntegerField(blank=True, null=True)
+class Song(models.Model):
+    song_id = models.UUIDField(db_column="Song_ID", primary_key=True)
+    artist_id = models.UUIDField(db_column="Artist_ID")
+    title = models.CharField(db_column="Title", blank=True, null=True)
+    year = models.CharField(db_column="Year", blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = "user_based_dataset"
+        db_table = "SONG"
+
+
+class Playlist(models.Model):
+    record_id = models.UUIDField(db_column="Record_ID", primary_key=True)
+    playlist_id = models.UUIDField(db_column="Playlist_ID")
+    song = models.UUIDField(db_column="Song_ID")
+    user = models.UUIDField(db_column="User_ID")
+    listen_count = models.CharField(db_column="Listen_Count", blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = "PLAYLIST"
+
+
+class Artist(models.Model):
+    artist_id = models.UUIDField(db_column="Artist_ID", primary_key=True)
+    artist_name = models.CharField(db_column="Artist_Name", blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = "ARTIST"
