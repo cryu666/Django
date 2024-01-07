@@ -32,20 +32,23 @@ def songs(request):
         year = int(date.split("-")[0])
         request.session["name"] = name
         request.session["year"] = year
-        
-    songs = recommend_songs([{"name": request.session["name"], "year": request.session["year"]}], spotify_data)
-    
+
+    songs = recommend_songs(
+        [{"name": request.session["name"], "year": request.session["year"]}],
+        spotify_data,
+    )
+
     # Iterate through each song and modify the 'artists' key
     for song in songs:
         # Extracting the artist names from the string representation of the list
-        artists_str = song['artists'][1:-1]  # Removing the square brackets
-        artists_list = [artist.strip()[1:-1] for artist in artists_str.split(',')]
+        artists_str = song["artists"][1:-1]  # Removing the square brackets
+        artists_list = [artist.strip()[1:-1] for artist in artists_str.split(",")]
 
         # Joining the artist names into a comma-separated string
-        artists_display = ', '.join(artists_list)
+        artists_display = ", ".join(artists_list)
 
         # Update the 'artists' key in the dictionary
-        song['artists'] = artists_display
+        song["artists"] = artists_display
 
     context = {
         "search": request.session["name"],
@@ -59,8 +62,10 @@ def upload_img(request):
     if request.method == "POST":
         uploaded_image = request.FILES.get("image")
         if uploaded_image is None:
-            return render(request, "mainpage.html", {'message': 'Please select an image.'})
-        
+            return render(
+                request, "mainpage.html", {"message": "Please select an image."}
+            )
+
         fs = FileSystemStorage(location=settings.STATICFILES_DIRS[0] + "/images")
         filename = fs.save(uploaded_image.name, uploaded_image)
         image_url = settings.STATIC_URL + "images/" + filename
@@ -82,20 +87,26 @@ def upload_img(request):
             # Iterate through each song and modify the 'artists' key
             for song in songs:
                 # Extracting the artist names from the string representation of the list
-                artists_str = song['artists'][1:-1]  # Removing the square brackets
-                artists_list = [artist.strip()[1:-1] for artist in artists_str.split(',')]
+                artists_str = song["artists"][1:-1]  # Removing the square brackets
+                artists_list = [
+                    artist.strip()[1:-1] for artist in artists_str.split(",")
+                ]
 
                 # Joining the artist names into a comma-separated string
-                artists_display = ', '.join(artists_list)
+                artists_display = ", ".join(artists_list)
 
                 # Update the 'artists' key in the dictionary
-                song['artists'] = artists_display
+                song["artists"] = artists_display
 
             context = {"mood": mood, "songs": songs}
 
             return render(request, "emotion_playlist.html", context)
         except:
-            return render(request, "mainpage.html", {'message': 'Please upload a clear personal photo of your face.'})
+            return render(
+                request,
+                "mainpage.html",
+                {"message": "Please upload a clear personal photo of your face."},
+            )
 
         finally:
             if os.path.exists(settings.STATICFILES_DIRS[0] + "/images/" + filename):

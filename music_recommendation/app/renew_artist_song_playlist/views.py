@@ -3,25 +3,26 @@ import uuid
 from json import JSONEncoder
 from uuid import UUID
 
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseRedirect
 # # Create your views here.
 # from django.contrib.auth.forms import AddSongForm
 from django.shortcuts import redirect, render
-from django.http import HttpResponseRedirect
-from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Users, Artist, Song, Playlist
+from .models import Artist, Playlist, Song, Users
+
 
 def add_song(request):
-    if request.method == 'POST':
-        song_name = request.POST.get('song_name')
+    if request.method == "POST":
+        song_name = request.POST.get("song_name")
         print(song_name)
-        artist_name = request.POST.get('artist_name')
+        artist_name = request.POST.get("artist_name")
         print(artist_name)
-        date = request.POST.get('song_date')
+        date = request.POST.get("song_date")
         print(date)
         year = int(date.split("-")[0])
         print(year)
-        username = request.session.get('username', None)
+        username = request.session.get("username", None)
         user = Users.objects.get(username=username)
         user_id = user.user_id
         # print(song_name)
@@ -39,16 +40,18 @@ def add_song(request):
             # print(artist_id, artist_name)
             artist = Artist.objects.create(artist_name=artist_name, artist_id=artist_id)
             artist.save()
-            
+
         # 更新歌曲資料庫
         try:
             song = Song.objects.get(artist_id=artist_id, title=song_name)
             song_id = song.song_id
             print("Song is found, skip creating")
-        except Song.DoesNotExist: 
+        except Song.DoesNotExist:
             print("Song is not found, creating a new song info")
             song_id = str(uuid.uuid4())
-            song = Song.objects.create(artist_id=artist_id, title=song_name, song_id=song_id, year=year)
+            song = Song.objects.create(
+                artist_id=artist_id, title=song_name, song_id=song_id, year=year
+            )
             song.save()
 
         try:
@@ -66,29 +69,45 @@ def add_song(request):
                 playlist_id = playlist.playlist_id
                 record_id = str(uuid.uuid4())
                 listen_count = 1
-                playlist = Playlist.objects.create(record_id=record_id, playlist_id=playlist_id, user_id=user_id, song_id=song_id, listen_count=listen_count)
+                playlist = Playlist.objects.create(
+                    record_id=record_id,
+                    playlist_id=playlist_id,
+                    user_id=user_id,
+                    song_id=song_id,
+                    listen_count=listen_count,
+                )
                 playlist.save()
-        except Playlist.DoesNotExist: 
-            print("3 User never listened to any song before, so we need to create a new playlist")
+        except Playlist.DoesNotExist:
+            print(
+                "3 User never listened to any song before, so we need to create a new playlist"
+            )
             playlist_id = str(uuid.uuid4())
             record_id = str(uuid.uuid4())
             listen_count = 1
-            playlist = Playlist.objects.create(record_id=record_id, playlist_id=playlist_id, user_id=user_id, song_id=song_id, listen_count=listen_count)
+            playlist = Playlist.objects.create(
+                record_id=record_id,
+                playlist_id=playlist_id,
+                user_id=user_id,
+                song_id=song_id,
+                listen_count=listen_count,
+            )
             playlist.save()
 
         playlist_query = Playlist.objects.filter(user_id=user_id)
         playlist_info = []
         for playlist_entry in playlist_query:
-            song = Song.objects.get(song_id=playlist_entry.song_id) 
+            song = Song.objects.get(song_id=playlist_entry.song_id)
             artist = Artist.objects.get(artist_id=song.artist_id)
-            playlist_info.append({
-                'song_title': song.title,
-                'artist_name': artist.artist_name,
-                'year': song.year,
-            })
-        request.session['user_playlist'] = playlist_info 
+            playlist_info.append(
+                {
+                    "song_title": song.title,
+                    "artist_name": artist.artist_name,
+                    "year": song.year,
+                }
+            )
+        request.session["user_playlist"] = playlist_info
 
-        referer = request.META.get('HTTP_REFERER')
+        referer = request.META.get("HTTP_REFERER")
         if referer is not None:
             print("redirect to original URL: %s", referer)
             return HttpResponseRedirect(referer)

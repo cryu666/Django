@@ -10,35 +10,39 @@ from sklearn.model_selection import train_test_split
 
 from .model.knn_recommender import KNNRecommender
 from .model.svd_recommender import SVDRecommender
-from .models import Playlist, Song, UserBasedDataset
+from .models import Artist, Playlist, Song
 
 # Create your views here.
 
 playlist = Playlist.objects.all()
 song_info = Song.objects.all()
+artist_info = Artist.objects.all()
 
 df_playlist = read_frame(playlist)
 df_song_info = read_frame(song_info)
+df_artist_info = read_frame(artist_info)
 
 # df_playlist.to_csv('df_playlist.csv')
-# df_song_info.to_csv('df_song_info.csv')
 
-df_playlist = df_playlist[['user', 'song', 'listen_count']]
-df_song_info = df_song_info[['song_id', 'title']]
+df_playlist = df_playlist[["user", "song", "listen_count"]]
+df_song_info = df_song_info[["song_id", "title", "artist_id", "year"]]
 
-df_playlist[['user', 'song']] = df_playlist[['user', 'song']].astype("string")
-df_song_info[['song_id', 'title']] = df_song_info[['song_id', 'title']].astype("string")
+# df_playlist[['user', 'song']] = df_playlist[['user', 'song']].astype("string")
+# df_playlist['song'] = df_playlist['song'].str.extract(r"\((.*?)\)" , expand=False)
 
-df_playlist['song'] = df_playlist['song'].str.extract(r"\((.*?)\)" , expand=False)
-df_playlist['user'] = df_playlist['user'].str.extract(r"\((.*?)\)" , expand=False)
+df_playlist_actual = df_playlist.drop_duplicates(subset=["song", "user"], keep=False)
 
-df_playlist_actual = df_playlist.drop_duplicates(subset=['song', 'user'], keep=False)
-
-df_songs = pd.merge(
+df_tmp = pd.merge(
     df_playlist_actual, df_song_info, left_on="song", right_on="song_id", how="left"
 )
-df_songs = df_songs[["song", "user", "listen_count", "title"]]
+df_tmp.drop(columns=["song_id"])
+
+df_songs = pd.merge(
+    df_tmp, df_artist_info, left_on="artist_id", right_on="artist_id", how="left"
+)
+df_songs = df_songs[["user", "song", "title", "artist_name", "listen_count", "year"]]
 # df_songs.to_csv('df_songs.csv')
+
 
 def KNN(request):
     df_song_id_reduced = df_songs.reset_index(drop=True)
@@ -62,8 +66,6 @@ def KNN(request):
         )
     }
 
-    test_dict = dict(zip(df_unique_songs.song, df_unique_songs.title))
-
     model = KNNRecommender(
         metric="cosine",
         algorithm="brute",
@@ -76,7 +78,9 @@ def KNN(request):
         song = request.POST.get("song_input")
         request.session["song"] = song
 
-    knn_recommendation = model.make_recommendation(new_song= request.session["song"], n_recommendations=10)
+    knn_recommendation = model.make_recommendation(
+        new_song=request.session["song"], n_recommendations=10
+    )
 
     recommended_artists = []
     recommended_years = []
@@ -88,7 +92,9 @@ def KNN(request):
 
     context = {
         "song": request.session["song"],
-        "knn_recommendation": zip(knn_recommendation, recommended_artists, recommended_years),
+        "knn_recommendation": zip(
+            knn_recommendation, recommended_artists, recommended_years
+        ),
     }
 
     return render(request, "knn.html", context)  # type(context) should be dict
