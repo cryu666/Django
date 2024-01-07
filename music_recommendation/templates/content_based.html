@@ -18,7 +18,13 @@
                 <p>{{x.artists}}</p> 
             </button>
             <div class="panel">
-                <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                <form method="POST" action="{% url 'add_song' %}">
+                    {% csrf_token %}
+                        <button type="submit"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                        <input type="hidden" value="{{x.name}}" name="song_name"/>
+                        <input type="hidden" value="{{x.artists}}" name="artist_name"/>
+                        <input type="hidden" value="{{x.year}}" name="song_date"/>
+                </form>
                 <form method="POST" action="{% url 'songs'%}">
                     {% csrf_token %}
                     <input type="hidden" value="{{x.name}}" name="song_name"/>

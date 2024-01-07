@@ -6,7 +6,7 @@ from uuid import UUID
 # # Create your views here.
 # from django.contrib.auth.forms import AddSongForm
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Users, Artist, Song, Playlist
@@ -14,16 +14,19 @@ from .models import Users, Artist, Song, Playlist
 def add_song(request):
     if request.method == 'POST':
         song_name = request.POST.get('song_name')
+        print(song_name)
         artist_name = request.POST.get('artist_name')
+        print(artist_name)
         date = request.POST.get('song_date')
+        print(date)
         year = int(date.split("-")[0])
-
+        print(year)
         username = request.session.get('username', None)
         user = Users.objects.get(username=username)
         user_id = user.user_id
-        print(song_name)
-        print(artist_name)
-        print(year)
+        # print(song_name)
+        # print(artist_name)
+        # print(year)
 
         # 更新藝人資料庫
         try:
@@ -50,8 +53,8 @@ def add_song(request):
 
         try:
             # Does the playlist exist? Which means whether user listend to any song.
-            playlist = Playlist.objects.filter(user_id=user_id).first()
-            playlist_id = playlist.playlist_id
+            if not Playlist.objects.filter(user_id=user_id):
+                playlist = Playlist.objects.get(user_id=user_id)
             try:
                 playlist = Playlist.objects.get(song_id=song_id, user_id=user_id)
                 playlist.listen_count += 1
@@ -59,6 +62,8 @@ def add_song(request):
                 print("1 User listened to this song before, just add listen count")
             except Playlist.DoesNotExist:
                 print("2 User do have playlist, but doesn't listen to this song before")
+                playlist = Playlist.objects.filter(user_id=user_id).first()
+                playlist_id = playlist.playlist_id
                 record_id = str(uuid.uuid4())
                 listen_count = 1
                 playlist = Playlist.objects.create(record_id=record_id, playlist_id=playlist_id, user_id=user_id, song_id=song_id, listen_count=listen_count)
@@ -83,6 +88,9 @@ def add_song(request):
             })
         request.session['user_playlist'] = playlist_info 
 
-        return redirect("search")
-    # return render(request, "search.html")
-    return redirect("search")
+        referer = request.META.get('HTTP_REFERER')
+        if referer is not None:
+            print("redirect to original URL: %s", referer)
+            return HttpResponseRedirect(referer)
+        else:
+            return redirect("home")
