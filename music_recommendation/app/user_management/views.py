@@ -5,6 +5,7 @@ from uuid import UUID
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+
 # Create your views here.
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
