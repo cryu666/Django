@@ -31,10 +31,11 @@
     {% if request.session.username %}
       <div class="btn-group1">
         <span> Similar User </span>
-        {% for x in '12345' %}
+        {% for x in request.session.svd %}
           <form method="post" action="{% url 'temp' %}">
             {% csrf_token %}
-            <button style="width:150px" ><i class="fa-solid fa-user"></i><br>User {{x}}</button>
+            <button style="width:150px" ><i class="fa-solid fa-user"></i><br>{{x}}</button>
+            <input type="hidden" value="{{x}}" name="similar_user"/>
           </form>
         {% endfor %}
       </div>

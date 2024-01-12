@@ -11,6 +11,8 @@ from sklearn.model_selection import train_test_split
 from .model.knn_recommender import KNNRecommender
 from .model.svd_recommender import SVDRecommender
 from .models import Artist, Playlist, Song
+import asyncio
+import logging
 
 # Create your views here.
 
@@ -104,7 +106,6 @@ def KNN(request):
 
 
 def SVD(request):
-
     df_songs_reduced = df_songs.reset_index(drop=True)[["song", "user", "listen_count"]]
     df_songs_reduced["listen_count"] = 1
 
@@ -129,10 +130,14 @@ def SVD(request):
     userId = request.session["user_id"]
     svd_recommendation = svd.topN_similar(x=userId, N=5, column="user")
     print("svd recommendation...")
+    print(svd_recommendation)
+    request.session["svd"] = svd_recommendation
 
-    similar_user_playlist = {}
+    return render(request, "mainpage.html")
 
-    for similar_user in svd_recommendation:
+def SVD_playlist(request):      
+    if request.method == "POST":
+        similar_user = request.POST.get("similar_user")
 
         playlist_query = Playlist.objects.filter(user=similar_user)
 
@@ -147,16 +152,13 @@ def SVD(request):
                     "year": song.year,
                 }
             )
-        similar_user_playlist[similar_user] = playlist_info
+        similar_user_playlist = playlist_info
 
     print(f"similar_user_playlist: {similar_user_playlist}")
     context = {
-        "recommendation_playlist": similar_user_playlist,
-        "recommendation_user": similar_user_playlist.keys(),
+        "similar_user": similar_user,
+        "recommendation_playlist": similar_user_playlist
     }
 
-    return render(request, "svd.html", context)
+    return render(request, "temp.html", context)
 
-
-def temp(request):
-    return render(request, "temp.html")

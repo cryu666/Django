@@ -11,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
 
 from .models import Artist, Playlist, Song, Users
+from app.recommender_collaborative.views import SVD
 
 
 class UUIDEncoder(json.JSONEncoder):
@@ -78,12 +79,15 @@ def loginPage(request):
                 )
 
             request.session["user_playlist"] = playlist_info
-
+            SVD(request)
+            
             messages.success(request, "Login successed.")
+            
             return redirect("home")
 
         messages.error(request, "Invalid username or password.")
         return redirect("login")
+    
 
     return render(request, "login.html")
 
