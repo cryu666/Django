@@ -32,7 +32,6 @@ urlpatterns = [
     ),
     path("knn/", views_coll.KNN, name="knn"),
     path("temp/", views_coll.SVD_playlist, name="temp"),
-    path("svd/", views_coll.SVD, name="temp"),
     path("", include("app.recommender_content.urls")),
     path("", include("app.user_management.urls")),
     path("", include("app.renew_artist_song_playlist.urls")),

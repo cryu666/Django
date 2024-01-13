@@ -11,8 +11,6 @@ from sklearn.model_selection import train_test_split
 from .model.knn_recommender import KNNRecommender
 from .model.svd_recommender import SVDRecommender
 from .models import Artist, Playlist, Song
-import asyncio
-import logging
 
 # Create your views here.
 
@@ -106,6 +104,7 @@ def KNN(request):
 
 
 def SVD(request):
+
     df_songs_reduced = df_songs.reset_index(drop=True)[["song", "user", "listen_count"]]
     df_songs_reduced["listen_count"] = 1
 
@@ -132,31 +131,31 @@ def SVD(request):
     print("svd recommendation...")
     print(svd_recommendation)
     request.session["svd"] = svd_recommendation
-
+    
     return render(request, "mainpage.html")
 
 def SVD_playlist(request):      
-    if request.method == "POST":
+    if request.method == "POST":    
         similar_user = request.POST.get("similar_user")
+        request.session["similar_user"] = similar_user
+    
+    playlist_query = Playlist.objects.filter(user=request.session["similar_user"])
 
-        playlist_query = Playlist.objects.filter(user=similar_user)
+    playlist_info = []
+    for playlist_entry in playlist_query:
+        song = Song.objects.get(song_id=playlist_entry.song)
+        artist = Artist.objects.get(artist_id=song.artist_id)
+        playlist_info.append(
+            {
+                "song": song.title,
+                "artist": artist.artist_name,
+                "year": song.year,
+            }
+        )
+    similar_user_playlist = playlist_info
 
-        playlist_info = []
-        for playlist_entry in playlist_query:
-            song = Song.objects.get(song_id=playlist_entry.song)
-            artist = Artist.objects.get(artist_id=song.artist_id)
-            playlist_info.append(
-                {
-                    "song": song.title,
-                    "artist": artist.artist_name,
-                    "year": song.year,
-                }
-            )
-        similar_user_playlist = playlist_info
-
-    print(f"similar_user_playlist: {similar_user_playlist}")
     context = {
-        "similar_user": similar_user,
+        "similar_user": request.session["similar_user"],
         "recommendation_playlist": similar_user_playlist
     }
 
