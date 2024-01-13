@@ -8,7 +8,7 @@
     {% else %}
     <h1 class="title">Check out {{similar_user}}'s favorite tracks!</h1>
     <div class="list">
-        {% for song, artist, year in svd_recommendation %}
+        {% for song, artist, year in recommendation_list %}
             <button class="accordion"> {{song}} 
                 <div class="menuicon">
                     <div></div>

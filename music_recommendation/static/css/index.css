@@ -351,6 +351,10 @@ body {
   font-size: 18px;
   border: none;
   font-family: 'Montserrat', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
 }
 
 
