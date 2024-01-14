@@ -77,28 +77,25 @@ def loginPage(request):
                         "year": song.year,
                     }
                 )
-
             request.session["user_playlist"] = playlist_info
-            SVD(request)
-            
+
+            if request.session["user_playlist"]:             
+                SVD(request)
+                #request.session["svd"] =['a0c7d5ef-3fb7-4c2f-96cc-a509518018b5', 'b0384c14-fa01-4b13-a531-bb8320377d68', '60e4aca8-68bc-4401-badb-90b7cba70fa3', 'e0fd1c5e-c757-4e80-9093-8df2c9d9a6f5', 'e039a386-f237-4deb-9abb-5471c89e7d73']
+                
             messages.success(request, "Login successed.")
             
             return redirect("home")
 
         messages.error(request, "Invalid username or password.")
         return redirect("login")
-    
 
     return render(request, "login.html")
 
 
 def logout_view(request):
     if "username" in request.session:
-        del request.session["username"]
-
-        if "user_id" in request.session:
-            del request.session["user_id"]
-
+        request.session.flush()
+        print("flush")  
         messages.success(request, "Logout successed.")
-
     return redirect("home")

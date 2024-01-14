@@ -31,13 +31,17 @@
     {% if request.session.username %}
       <div class="btn-group1">
         <span> Similar User </span>
-        {% for x in request.session.svd %}
-          <form method="post" action="{% url 'temp' %}">
-            {% csrf_token %}
-            <button style="width:150px" ><i class="fa-solid fa-user"></i><br>{{x}}</button>
-            <input type="hidden" value="{{x}}" name="similar_user"/>
-          </form>
-        {% endfor %}
+        {% if not request.session.user_playlist %}
+            <p class="card-text">Add songs to your playlist to use this feature.</p>
+        {% else %}
+          {% for x in request.session.svd %}
+            <form method="post" action="{% url 'temp' %}">
+              {% csrf_token %}
+              <button style="width:150px" ><i class="fa-solid fa-user"></i><br>{{x}}</button>
+              <input type="hidden" value="{{x}}" name="similar_user"/>
+            </form>
+          {% endfor %}
+        {% endif %}
       </div>
     {% else %}
       </br></br></br></br>
