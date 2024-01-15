@@ -6,29 +6,34 @@
     {% if incorrect %}
     <h4>{{incorrect}}</h4>
     {% else %}
-    <h1 class="title">Check out XXX's favorite tracks!</h1>
-
+    <h1 class="title">Check out {{similar_user}}'s favorite tracks!</h1>
     <div class="list">
-        {% for x in 'xxxxxxxx' %}
-            <button class="accordion"> song name 
+        {% for x in recommendation_playlist %}
+            <button class="accordion"> {{x.song}} 
                 <div class="menuicon">
                     <div></div>
                     <div></div>
                     <div></div>
                 </div>
-                <p>artist</p> 
+                <p>{{x.artist}}</p> 
             </button>
             <div class="panel">
-                <button href="#"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                <form method="POST" action="{% url 'add_song' %}">
+                    {% csrf_token %}
+                        <button type="submit"><i class="fa-solid fa-heart"></i>&emsp;Add to Favorite Tracks</button>
+                        <input type="hidden" value="{{x.song}}" name="song_name"/>
+                        <input type="hidden" value="{{x.artist}}" name="artist_name"/>
+                        <input type="hidden" value="{{x.year}}" name="song_date"/>
+                </form>
                 <form method="POST" action="{% url 'songs'%}">
                     {% csrf_token %}
-                    <input type="hidden" value="{{x.name}}" name="song_name"/>
+                    <input type="hidden" value="{{x.song}}" name="song_name"/>
                     <input type="hidden" value="{{x.year}}" name="song_date"/>
                     <button type="submit"><i class="fa-solid fa-music"></i>&emsp;Recommend Playlist with Similar Songs</a>
                 </form>
                 <form method="POST" action="{% url 'knn'%}">
                     {% csrf_token %}
-                    <input type="hidden" value="{{x.name}}" name="song_input"/>
+                    <input type="hidden" value="{{x.song}}" name="song_input"/>
                     <button href="#"><i class="fa-solid fa-headphones"></i>&emsp;Explore Similar Music Preferences of Listeners</button>
                 </form>
             </div>

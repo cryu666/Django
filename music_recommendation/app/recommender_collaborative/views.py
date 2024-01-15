@@ -41,7 +41,10 @@ df_songs = pd.merge(
     df_tmp, df_artist_info, left_on="artist_id", right_on="artist_id", how="left"
 )
 df_songs = df_songs[["user", "song", "title", "artist_name", "listen_count", "year"]]
-# df_songs.to_csv('df_songs.csv')
+df_songs[["user", "song", "title", "artist_name"]] = df_songs[
+    ["user", "song", "title", "artist_name"]
+].astype("string")
+# df_songs.to_csv("df_songs.csv")
 
 
 def KNN(request):
@@ -108,28 +111,53 @@ def SVD(request):
     svd = SVDRecommender(no_of_features=8)
 
     train, test = train_test_split(df_songs_reduced)
+    print("Split...")
 
     # Creates the user-item matrix, the user_id on the rows and the song_id on the columns.
     user_item_matrix, users, items = svd.create_utility_matrix(
         train,
         formatizer={"user": "user", "item": "song", "value": "listen_count"},
     )
+    print("Create matrix...")
 
     # fits the svd model to the matrix data.
     svd.fit(user_item_matrix, users, items)
+    print("Fit...")
 
     # outputs N most similar users to user with user_id x
-    userId = request.POST.get(
-        "userId_input", "7791528f-1ae9-429d-beb1-97ecdb006843"
-    )  # !!!!!!!!!
+    print(f"user id: {request.session['user_id']}")
+    userId = request.session["user_id"]
     svd_recommendation = svd.topN_similar(x=userId, N=5, column="user")
+    print("svd recommendation...")
+    print(svd_recommendation)
+    request.session["svd"] = svd_recommendation
+    
+    return render(request, "mainpage.html")
+
+def SVD_playlist(request):      
+    if request.method == "POST":    
+        similar_user = request.POST.get("similar_user")
+        request.session["similar_user"] = similar_user
+    
+    playlist_query = Playlist.objects.filter(user=request.session["similar_user"])
+
+    playlist_info = []
+    for playlist_entry in playlist_query:
+        song = Song.objects.get(song_id=playlist_entry.song)
+        artist = Artist.objects.get(artist_id=song.artist_id)
+        playlist_info.append(
+            {
+                "song": song.title,
+                "artist": artist.artist_name,
+                "year": song.year,
+            }
+        )
+    similar_user_playlist = playlist_info
 
     context = {
-        "svd_recommendation": svd_recommendation,
+        "similar_user": request.session["similar_user"],
+        "recommendation_playlist": similar_user_playlist
     }
 
-    return render(request, "svd.html", context)
+    return render(request, "temp.html", context)
 
-
-def temp(request):
-    return render(request, "temp.html")
